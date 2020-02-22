@@ -12,45 +12,19 @@ MongoClient.connect(connectionUrl, { useNewUrlParser: true }, (error, client) =>
 
     const db = client.db(dataBaseName);
 
-    db.collection("tasks").insertMany([
-            {
-                description: "Create a task",
-                completed: false
-            },
-            {
-                description: "Complete a task",
-                completed: false
-            },
-            {
-                description: "Check if it is done",
-                completed: true
-            }
-        ],
-        (error, result) => {
-            if (error) {
-                return console.log("Unable to insert documents in Tasks Collection");
-            }
-
-            console.log(result.ops);
-        }
-    );
-
-    db.collection("users").insertOne({
-        name: "Jenny",
-        age: 21
-    }, (error, result) => {
-        if(error){
-            return console.log("Unable to insert document in users")
+   db.collection("tasks").findOne({ _id: new ObjectId("5e504dbf2092884853f41563") }, (error, user) => {
+        if (error) {
+            return console.log("Unable to find document in tasks");
         }
 
-        console.log(result);
+        console.log(user);
     });
 
-    db.collection("users").findOne({ _id: new ObjectId("5e510e9e53ce044a18dd7db6") }, (error, result) => {
+    db.collection("tasks").find({ completed: false }).toArray((error, tasks) => {
         if (error) {
-            return console.log("Unable to find document in users");
+            return console.log("Unable to find document in tasks");
         }
 
-        console.log(result);
+        console.log(tasks);
     });
 });
