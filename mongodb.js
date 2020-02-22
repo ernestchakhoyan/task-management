@@ -12,19 +12,39 @@ MongoClient.connect(connectionUrl, { useNewUrlParser: true }, (error, client) =>
 
     const db = client.db(dataBaseName);
 
-   db.collection("tasks").findOne({ _id: new ObjectId("5e504dbf2092884853f41563") }, (error, user) => {
-        if (error) {
-            return console.log("Unable to find document in tasks");
-        }
+    const promiseToUpdate = db.collection("users").updateOne(
+        { _id: new ObjectId("5e504b07ec21b2482ed8f090") },
+        {
+            $set: {
+                name: "Joker"
+            },
+            $rename: {
+                ages: "age"
+            }
+        });
 
-        console.log(user);
-    });
+    promiseToUpdate
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error)
+        })
 
-    db.collection("tasks").find({ completed: false }).toArray((error, tasks) => {
-        if (error) {
-            return console.log("Unable to find document in tasks");
-        }
 
-        console.log(tasks);
-    });
+    const promiseToUpdateMany = db.collection("tasks").updateMany(
+        {completed: false},
+        {
+            $set: {
+                completed: true
+            }
+        });
+
+    promiseToUpdateMany
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error)
+        })
 });
