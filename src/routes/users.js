@@ -2,6 +2,17 @@ const express = require("express");
 const router = new express.Router();
 const User = require("../models/user");
 
+router.post("/users/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findCredentials(email, password);
+        const token = await user.generateAuthToken();
+        res.status(200).send({ user, token });
+    } catch (e) {
+        res.status(401).send(e);
+    }
+});
+
 router.post("/users", async (req, res) => {
     try {
         const user = new User(req.body);
@@ -48,7 +59,7 @@ router.patch("/users/:id", async (req, res) => {
     try {
         const user = await User.findById(_id);
 
-        updates.forEach((update) => user[update] = req.body[update]);
+        updates.forEach((update) => user[ update ] = req.body[ update ]);
         await user.save();
 
         if (!user) {
