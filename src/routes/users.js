@@ -1,5 +1,6 @@
 const express = require("express");
 const router = new express.Router();
+const multer = require("multer");
 const User = require("../models/user");
 const auth = require("../middleware/auth");
 
@@ -14,24 +15,24 @@ router.post("/users/login", async (req, res) => {
     }
 });
 
-router.post("/users/logout",auth, async (req, res) => {
+router.post("/users/logout", auth, async (req, res) => {
     try {
-       req.user.tokens = req.user.tokens.filter(item => item.token !== req.token);
+        req.user.tokens = req.user.tokens.filter(item => item.token !== req.token);
 
-       await req.user.save();
-       res.send();
+        await req.user.save();
+        res.send();
     } catch (e) {
         console.log(e);
         res.status(401).send(e);
     }
 });
 
-router.post("/users/logoutAll",auth, async (req, res) => {
+router.post("/users/logoutAll", auth, async (req, res) => {
     try {
-       req.user.tokens = [];
+        req.user.tokens = [];
 
-       await req.user.save();
-       res.send();
+        await req.user.save();
+        res.send();
     } catch (e) {
         res.status(500).send(e);
     }
@@ -55,7 +56,7 @@ router.get("/users/me", auth, async (req, res) => {
     }
 });
 
-router.patch("/users/me",auth, async (req, res) => {
+router.patch("/users/me", auth, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = [ "name", "email", "password", "age" ];
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
@@ -83,6 +84,23 @@ router.delete("/users/me", auth, async (req, res) => {
     } catch (e) {
         res.status(500).send();
     }
+});
+
+const avatar = multer({
+    dest: "avatars",
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb){
+        if(!file.originalname.match(/\.(jpg|png|jpeg)$/)){
+            return cb(new Error("Please upload an  image"))
+        }
+
+        cb(undefined, true);
+    }
+});
+router.post("/users/me/avatar", avatar.single("avatar"), async (req, res) => {
+    res.send();
 });
 
 module.exports = router;
