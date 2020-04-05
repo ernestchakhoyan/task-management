@@ -101,6 +101,8 @@ const avatar = multer({
 });
 router.post("/users/me/avatar", avatar.single("avatar"), async (req, res) => {
     res.send();
+}, (error, req, res, next) => {
+    res.status(400).send({error: error.message})
 });
 
 module.exports = router;
